@@ -1,0 +1,18 @@
+version: "3"
+name: "inception"
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/wordpress/.
+    restart: always
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx/.
+    restart: always
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress/.
+    restart: always
