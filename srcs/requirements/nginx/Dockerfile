@@ -3,6 +3,8 @@ FROM alpine:3.17
 LABEL version="1.0"
 LABEL description="nginx"
 
+ENV TERM xterm-256color
+
 # nginx user
 RUN addgroup -S www-data && adduser -S www-data -G www-data || true;
 RUN adduser -S -D -G www-data www-data || true;
@@ -24,6 +26,9 @@ RUN mkdir -p /var/www
 RUN chown -R www-data:www-data /var/www
 RUN chmod 755 /var/www
 
+# REDIRECT LOGS
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log
+
 EXPOSE 443
 
-CMD [ "nginx", "-g", "daemon off;" ]
+ENTRYPOINT [ "nginx", "-g", "daemon off;" ]

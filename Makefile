@@ -1,11 +1,11 @@
 all: up
 build:
-	cd srcs && docker-compose build
+	docker-compose -f ./srcs/docker-compose.yml build
 up:
-	cd srcs && docker-compose up -d
+	docker-compose -f ./srcs/docker-compose.yml up -d
 down:
-	cd srcs && docker-compose down
+	docker-compose -f ./srcs/docker-compose.yml down
 logs:
-	cd srcs && docker-compose logs -f
+	docker-compose -f ./srcs/docker-compose.yml logs -f
 rebuild: down build up
 .PHONY: all build up down logs rebuild
