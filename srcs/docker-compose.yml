@@ -1,6 +1,7 @@
-version: "3.8"
+version: "3.9"
 name: "inception"
 services:
+
   mariadb:
     build:
       context: ./requirements/mariadb/.
@@ -9,7 +10,9 @@ services:
     env_file:
       - .env
     container_name: mariadb
-    restart: always
+    restart: on-failure
+    expose:
+      - 3306
     networks:
       - inception
 
@@ -17,11 +20,12 @@ services:
     build:
       context: ./requirements/nginx/.
     volumes:
-      - wordpress:/var/www/wordpress
+      - nginx:/var/www
     container_name: nginx
     depends_on:
       - wordpress
-    restart: always
+      - adminer
+    restart: on-failure
     ports:
       - "443:443"
     networks:
@@ -31,29 +35,110 @@ services:
     build:
       context: ./requirements/wordpress/.
     volumes:
-      - wordpress:/var/www/wordpress
+      - nginx:/var/www
     container_name: wordpress
     env_file:
       - .env
     depends_on:
       - mariadb
-    restart: always
+      - redis
+    restart: on-failure
+    expose:
+      - 9000
+    networks:
+      - inception
+
+  redis:
+    build:
+      context: ./requirements/bonus/redis/.
+    container_name: redis
+    env_file:
+      - .env
+    restart: on-failure
+    volumes:
+      - nginx:/var/www
+    expose:
+      - 6379
+    networks:
+      - inception
+
+  adminer:
+    build:
+      context: ./requirements/bonus/adminer/.
+    container_name: adminer
+    env_file:
+      - .env
+    restart: on-failure
+    volumes:
+      - nginx:/var/www
+    depends_on:
+      - mariadb
+    expose:
+      - 9000
+    networks:
+      - inception
+
+  vsftpd:
+    build:
+      context: ./requirements/bonus/vsftpd/.
+    container_name: vsftpd
+    env_file:
+      - .env
+    restart: on-failure
+    volumes:
+      - nginx:/var/www
+    ports:
+      - "20:20"
+      - "990:990"
+      - "21:21"
+      - "21100-21110:21100-21110"
+    networks:
+      - inception
+
+  builder:
+    build:
+      context: ./requirements/bonus/website/.
+    container_name: builder
+    volumes:
+      - nginx:/var/www
+
+  grafana:
+    build:
+      context: ./requirements/bonus/grafana/.
+    container_name: grafana
+    env_file:
+      - .env
+    restart: on-failure
+    expose:
+      - 3000
+    networks:
+      - inception
+
+  prometheus:
+    build:
+      context: ./requirements/bonus/prometheus/.
+    container_name: prometheus
+    env_file:
+      - .env
+    restart: on-failure
+    expose:
+      - 9090
     networks:
       - inception
 
 volumes:
-  wordpress:
+  nginx:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/ebouvier/data/wordpress'
+      device: '/home/${USER}/data/nginx'
   mariadb:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/ebouvier/data/mariadb'
+      device: '/home/${USER}/data/mariadb'
 
 networks:
   inception:
