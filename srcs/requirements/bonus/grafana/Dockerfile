@@ -6,6 +6,5 @@ LABEL description="grafana"
 ENV TERM xterm-256color
 
 RUN apk update && apk add grafana
-RUN chown -R grafana:grafana /usr/share/grafana
-USER grafana
-CMD [ "grafana-server", "-config", "/etc/grafana.ini", "-homepath", "/usr/share/grafana" ]
+COPY ./tools/setup.sh .
+CMD [ "sh", "setup.sh" ]

@@ -26,6 +26,11 @@ WP_ADMIN_EMAIL=
 FTP_USER=
 FTP_PASSWORD=
 FTP_PATH=/var/www
+
+#grafana
+GRAFANA_ADMIN_USER=
+GRAFANA_ADMIN_PASSWORD=
+
 ```
 ``````
 /etc/hosts:
